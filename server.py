@@ -3,6 +3,8 @@ import hashlib
 import random
 import socket
 import time
+from turtle import back
+from colorama import Fore, Style, Back
 
 # Initialize variables
 hash = ""
@@ -14,6 +16,7 @@ diff = str(max)
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("127.0.0.1",9090))
 server.listen()
+
 
 # Function for generating hash
 def gen_hash(min, max):
@@ -32,11 +35,11 @@ if(s.decode() == "Ready"):
     print("Recived ack")
     time.sleep(1)
     conn.send(diff.encode())
-    print("Sending Job: ")
+    
 
     # Generating hash to find
     hashb = gen_hash(min, max)
-    print(hashb)
+    print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
 
     # Sending hash to client
     time.sleep(1)
@@ -49,7 +52,6 @@ if(s.decode() == "Ready"):
             num = hash_stats.split("Found hash: ")
             cnum1 = num[1].replace("b'", "")
             cnum = cnum1.replace("'", "")
-            print(num[1])
             
             # Checking if  client is resending the same hash send by the server 
             if(cnum == hashb):
@@ -60,16 +62,16 @@ if(s.decode() == "Ready"):
                 hashb = gen_hash(min, max)
                 time.sleep(5)
                 conn.send(hashb.encode())
-                print(f'Sending job: {hashb}')
+                print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
             else:
                 chash = hashlib.sha256(num[1].encode()).hexdigest()
                 if (chash == hashb):
                     time.sleep(1)
-                    conn.send("GOOD SHARES".encode())
+                    conn.send(Back.GREEN + Fore.WHITE + "GOOD SHARES" + Style.RESET_ALL.encode())
                     hashb = gen_hash(min, max)
                     time.sleep(5)
                     conn.send(hashb.encode())
-                    print(f'Sending job: {hashb}')
+                    print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
 
             
 

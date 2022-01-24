@@ -2,6 +2,7 @@
 import hashlib
 import socket
 import time
+from colorama import Fore, Style
 
 # Connecting to the server
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
