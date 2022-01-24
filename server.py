@@ -6,7 +6,9 @@ import time
 
 # Initialize variables
 hash = ""
-diff = "100000"
+min = 100000
+max = 10000000
+diff = str(max)
 
 # Start the the sever and listen for the client
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,46 +16,59 @@ server.bind(("127.0.0.1",9090))
 server.listen()
 
 # Function for generating hash
-def gen_hash(hash):
-    a = random.randrange(10000, 100000)
+def gen_hash(min, max):
+    a = random.randrange(min, max)
     Digit = str(a).encode()
     hash = hashlib.sha256(Digit).hexdigest()
     return hash
 
-(clientConnected, clientAddress) = server.accept()
-print("Accepted a connection request from %s:%s"%(clientAddress[0], clientAddress[1]))
-s = clientConnected.recv(1024)
-stats = s.decode()
-if(stats == "Ready"):
-    print("Recived ack, sending job")
-    hashb = gen_hash(hash)
-    print(hashb)
-    clientConnected.send(hashb.encode())
+# Waiting for client to connect
+(conn, addr) = server.accept()
+print("Accepted a connection request from %s:%s"%(addr[0], addr[1]))
+
+# waithing for Client to send Ready ack
+s = conn.recv(1024)
+if(s.decode() == "Ready"):
+    print("Recived ack")
     time.sleep(1)
-    clientConnected.send(diff.encode())
-    while(True):
-        hash_stats = clientConnected.recv(1024).decode()
+    conn.send(diff.encode())
+    print("Sending Job: ")
+
+    # Generating hash to find
+    hashb = gen_hash(min, max)
+    print(hashb)
+
+    # Sending hash to client
+    time.sleep(1)
+    conn.send(hashb.encode())
+    while True:
+
+        # Waiting for client send the hash they found
+        hash_stats = conn.recv(1024).decode()
         if("Found hash: " in hash_stats):
             num = hash_stats.split("Found hash: ")
             cnum1 = num[1].replace("b'", "")
             cnum = cnum1.replace("'", "")
             print(num[1])
+            
+            # Checking if  client is resending the same hash send by the server 
             if(cnum == hashb):
                 print("Wrong hash returned")
-                clientConnected.send("BAD SHARES".encode())
-                hashb = gen_hash(hash)
+                conn.send("BAD SHARES".encode())
+
+                # Generating hash and send after 5s delay
+                hashb = gen_hash(min, max)
                 time.sleep(5)
-                clientConnected.send(hashb.encode())
+                conn.send(hashb.encode())
                 print(f'Sending job: {hashb}')
             else:
                 chash = hashlib.sha256(num[1].encode()).hexdigest()
                 if (chash == hashb):
-                    clientConnected.send("GOOD SHARES".encode())
-                    hashb = gen_hash(hash)
+                    time.sleep(1)
+                    conn.send("GOOD SHARES".encode())
+                    hashb = gen_hash(min, max)
                     time.sleep(5)
-                    clientConnected.send(hashb.encode())
-                    time.sleep(3)
-                    clientConnected.send(str(diff).encode())
+                    conn.send(hashb.encode())
                     print(f'Sending job: {hashb}')
 
             
