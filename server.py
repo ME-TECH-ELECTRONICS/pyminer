@@ -3,7 +3,7 @@ import hashlib
 import random
 import socket
 import time
-from turtle import back
+from _thread import *
 from colorama import Fore, Style, Back
 
 # Initialize variables
@@ -11,12 +11,17 @@ hash = ""
 min = 100000
 max = 10000000
 diff = str(max)
+host = "127.0.0.1"
+port = 9090
+ThreadCount = 0
 
 # Start the the sever and listen for the client
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("127.0.0.1",9090))
-server.listen()
-
+try:
+    server.bind((host, port))
+except socket.error as e:
+    print(str(e))
+server.listen(5)
+print("Server started at 127.0.0.1:9090")
 
 # Function for generating hash
 def gen_hash(min, max):
@@ -24,6 +29,16 @@ def gen_hash(min, max):
     Digit = str(a).encode()
     hash = hashlib.sha256(Digit).hexdigest()
     return hash
+
+def threaded_client(client):
+    client.send(str.encode('Welcome to the Servern'))
+    while True:
+        data = connection.recv(2048)
+        reply = 'Server Says: ' + data.decode('utf-8')
+        if not data:
+            break
+        client.sendall(str.encode(reply))
+    client.close()
 
 # Waiting for client to connect
 (conn, addr) = server.accept()
@@ -67,7 +82,7 @@ if(s.decode() == "Ready"):
                 chash = hashlib.sha256(num[1].encode()).hexdigest()
                 if (chash == hashb):
                     time.sleep(1)
-                    conn.send(Back.GREEN + Fore.WHITE + "GOOD SHARES" + Style.RESET_ALL.encode())
+                    conn.send("GOOD SHARES".encode())
                     hashb = gen_hash(min, max)
                     time.sleep(5)
                     conn.send(hashb.encode())

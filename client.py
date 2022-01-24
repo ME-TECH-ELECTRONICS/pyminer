@@ -2,7 +2,7 @@
 import hashlib
 import socket
 import time
-from colorama import Fore, Style
+from colorama import Fore, Back, Style
 
 # Connecting to the server
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,7 +20,7 @@ while True:
 
     # Requesting the ref hash from server
     ref_hash = client.recv(1024)
-    print("\nJob: ", ref_hash)
+    print("\nJob:", ref_hash)
     t1 = time.time()
 
     # Starting the mining process
@@ -40,6 +40,8 @@ while True:
             ref_hash = ""
             print(f'found hash in {tim}ms')
             print(f'Hashrate: {hashrate}KH/s')
-            reward = client.recv(1024)
-            print(reward.decode())
-
+            reward = client.recv(1024).decode()
+            if(reward == "GOOD SHARES"):
+                print(Back.GREEN + Fore.WHITE + reward + Style.RESET_ALL)
+            else:
+                print(Back.RED + Fore.WHITE + reward + Style.RESET_ALL)
