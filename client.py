@@ -4,19 +4,28 @@ import socket
 import time
 from colorama import Fore, Back, Style
 
+# Initialize variables
+client = socket.socket()
+HOST = "127.0.0.1"
+PORT = 9090
+
 # Connecting to the server
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("127.0.0.1",9090))
+try:
+    client.connect((HOST, PORT))
+except socket.error as e:
+    print(str(e))
 
-# Sending Ready ack to sever
-client.send("Ready".encode())
-print("Sending ack")
 
-# Requesting the difficulty of hash
-diff = client.recv(1024)
-print("Difficulty: ",diff.decode())
-dificulty = int(diff.decode())
+
 while True:
+    # Sending Ready ack to sever
+    client.send("Ready".encode())
+    print("Sending ack")
+
+    # Requesting the difficulty of hash
+    diff = client.recv(1024)
+    print("Difficulty: ",diff.decode())
+    dificulty = int(diff.decode())
 
     # Requesting the ref hash from server
     ref_hash = client.recv(1024)
@@ -45,3 +54,4 @@ while True:
                 print(Back.GREEN + Fore.WHITE + reward + Style.RESET_ALL)
             else:
                 print(Back.RED + Fore.WHITE + reward + Style.RESET_ALL)
+    client.close()
