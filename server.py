@@ -7,7 +7,7 @@ from _thread import *
 from colorama import Fore, Style, Back
 
 # Initialize variables
-
+Test ="" 
 hash = ""
 min = 100000
 max = 10000000
