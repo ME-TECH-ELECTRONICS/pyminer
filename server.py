@@ -12,8 +12,8 @@ hash = ""
 min = 100000
 max = 10000000
 diff = str(max)
-host = "127.0.0.1"
-port = 9090
+HOST = "127.0.0.1"
+PORT = 9090
 ThreadCount = 0
 
 # Start the the sever and listen for the client
