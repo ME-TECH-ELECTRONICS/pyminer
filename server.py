@@ -46,10 +46,10 @@ def client_thread(client):
     while True:
         # waithing for Client to send Ready ack
         s = client.recv(1024)
+        print(s)
         if(s.decode() == "Ready"):
             print("Recived ack")
-            time.sleep(1)
-            client.send(diff.encode())
+            #client.send(diff.encode())
     
         # Generating hash to find
         hashb = gen_hash(min, max)
@@ -86,15 +86,15 @@ def client_thread(client):
                     client.send(hashb.encode())
                     print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
         
-        client.close()
 
 
+if __name__ == '__main__':
+    while True:
+        client, address = server.accept()
 
-while True:
-    (client, address) = server.accept()
-    print('Connected to: ' + address[0] + ':' + str(address[1]))
-    start_new_thread(client_thread, (client, ))
-    server.close()           
+        print('Connected to: ' + address[0] + ':' + str(address[1]) )
+        start_new_thread(client_thread, (client, ))
+        #server.close()           
 
 
 

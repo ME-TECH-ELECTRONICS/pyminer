@@ -15,7 +15,11 @@ try:
 except socket.error as e:
     print(str(e))
 
+client.send("Ready".encode())
+print("Sending ack")
 
+    # Requesting the difficulty of hash
+diff = 10000000
 
 while True:
     # Sending Ready ack to sever
@@ -23,9 +27,9 @@ while True:
     print("Sending ack")
 
     # Requesting the difficulty of hash
-    diff = client.recv(1024)
-    print("Difficulty: ",diff.decode())
-    dificulty = int(diff.decode())
+    #diff = client.recv(1024)
+    print("Difficulty: ",diff)
+    dificulty = diff
 
     # Requesting the ref hash from server
     ref_hash = client.recv(1024)
@@ -51,7 +55,6 @@ while True:
             print(f'Hashrate: {hashrate}KH/s')
             reward = client.recv(1024).decode()
             if(reward == "GOOD SHARES"):
-                print(Back.GREEN + Fore.WHITE + reward + Style.RESET_ALL)
+                print(reward)
             else:
-                print(Back.RED + Fore.WHITE + reward + Style.RESET_ALL)
-    client.close()
+                print(reward)
