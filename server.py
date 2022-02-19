@@ -42,13 +42,13 @@ def recv_data():
         break
     return data
     
-def client_thread(client):
+def client_thread(client, addr):
     while True:
         # waithing for Client to send Ready ack
         s = client.recv(1024)
         print(s)
         if(s.decode() == "Ready"):
-            print("Recived ack")
+            print(addr + " - Recived ack")
             #client.send(diff.encode())
     
         # Generating hash to find
@@ -91,9 +91,9 @@ def client_thread(client):
 if __name__ == '__main__':
     while True:
         client, address = server.accept()
-
+        C_IP = address[0] + ":" + str(address[1])
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
-        start_new_thread(client_thread, (client, ))
+        start_new_thread(client_thread, (client, C_IP ))
         #server.close()           
 
 
