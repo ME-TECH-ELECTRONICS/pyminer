@@ -15,6 +15,7 @@ diff = str(max)
 HOST = "127.0.0.1"
 PORT = 9090
 ThreadCount = 0
+SERVER_VER = "v1.0"
 
 # Start the the sever and listen for the client
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,8 +50,6 @@ def client_thread(client, addr):
         print(s)
         if(s.decode() == "Ready"):
             print(addr + " - Recived ack")
-            #client.send(diff.encode())
-    
         # Generating hash to find
         hashb = gen_hash(min, max)
         print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
@@ -91,10 +90,10 @@ def client_thread(client, addr):
 if __name__ == '__main__':
     while True:
         client, address = server.accept()
+        client.send(f'{SERVER_VER},{diff}'.encode())
         C_IP = address[0] + ":" + str(address[1])
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
         start_new_thread(client_thread, (client, C_IP ))
-        #server.close()           
 
 
 

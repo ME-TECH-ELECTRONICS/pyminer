@@ -15,11 +15,12 @@ try:
 except socket.error as e:
     print(str(e))
 
+raw_data = client.recv(1024).decode().split(",")
+SERVER_VER = raw_data[0]
+diff = int(raw_data[1])
+print(f'Connected to {HOST}:{PORT}.Server version {SERVER_VER}. Happy Minning :)') 
 client.send("Ready".encode())
 print("Sending ack")
-
-    # Requesting the difficulty of hash
-diff = 10000000
 
 while True:
     # Sending Ready ack to sever
