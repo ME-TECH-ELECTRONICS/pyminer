@@ -14,7 +14,8 @@ max = 10000000
 diff = str(max)
 HOST = "127.0.0.1"
 PORT = 9090
-ThreadCount = 0
+thread_count = 0
+IPS = 0
 SERVER_VER = "v1.0"
 
 # Start the the sever and listen for the client
@@ -43,13 +44,20 @@ def recv_data():
         break
     return data
     
-def client_thread(client, addr):
+def client_thread(client, addr, IPS):
     while True:
         # waithing for Client to send Ready ack
         s = client.recv(1024)
         print(s)
         if(s.decode() == "Ready"):
             print(addr + " - Recived ack")
+        
+        if(s.decode() == "status"):
+            time.sleep(3)
+            client.send(f'{HOST},{PORT},{SERVER_VER}'.encode())
+            txt = f'{HOST},{PORT},{SERVER_VER},{IPS}'
+            print(txt)
+            break
         # Generating hash to find
         hashb = gen_hash(min, max)
         print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
@@ -91,9 +99,11 @@ if __name__ == '__main__':
     while True:
         client, address = server.accept()
         client.send(f'{SERVER_VER},{diff}'.encode())
+        thread_count += 1
+        IPS = str(thread_count)
         C_IP = address[0] + ":" + str(address[1])
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
-        start_new_thread(client_thread, (client, C_IP ))
+        start_new_thread(client_thread, (client, C_IP, IPS ))
 
 
 
