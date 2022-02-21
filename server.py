@@ -1,5 +1,6 @@
 # Include libraries
 import hashlib
+
 import random
 import socket
 import time
@@ -22,7 +23,7 @@ SERVER_VER = "v1.0"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("127.0.0.1", 9090))
 server.listen(10)
-print(Fore.GREEN +  Back.YELLOW + "Server started at 127.0.0.1:9090" + Style.RESET_ALL)
+print(Fore.GREEN + "Server started at 127.0.0.1:9090" + Style.RESET_ALL)
 
 # Function for generating hash
 def gen_hash(min, max):
@@ -31,69 +32,56 @@ def gen_hash(min, max):
     hash = hashlib.sha256(Digit).hexdigest()
     return hash
 
-def send_data(data):
-    while 1:
-        client.send(data)
-        interrupt_main()
-        break
-    
-def recv_data():
-    while 1:
-        data = client.recv(1024)
-        interrupt_main()
-        break
-    return data
     
 def client_thread(client, addr, IPS):
     while True:
-        # waithing for Client to send Ready ack
         s = client.recv(1024)
-        print(s)
-        if(s.decode() == "Ready"):
+        if (s.decode() == "STATUS"):
+            time.sleep(2)
+            client.send(f'{SERVER_VER},{IPS}'.encode())
+    
+        elif (s.decode() == "READY"):
             print(addr + " - Recived ack")
         
-        if(s.decode() == "status"):
-            time.sleep(3)
-            client.send(f'{HOST},{PORT},{SERVER_VER}'.encode())
-            txt = f'{HOST},{PORT},{SERVER_VER},{IPS}'
-            print(txt)
-            break
-        # Generating hash to find
-        hashb = gen_hash(min, max)
-        print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
+            # Generating hash to find
+            hashb = gen_hash(min, max)
+            print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
 
-        # Sending hash to client
-        time.sleep(1)
-        client.send(hashb.encode())
+            # Sending hash to client
+            time.sleep(1)
+            client.send(hashb.encode())
 
-        # Waiting for client send the hash they found
-        hash_stats = client.recv(1024).decode()
-        if("Found hash: " in hash_stats):
-            num = hash_stats.split("Found hash: ")
-            cnum1 = num[1].replace("b'", "")
-            cnum = cnum1.replace("'", "")
+            # Waiting for client send the hash they found
+            hash_stats = client.recv(1024).decode()
+            if("Found hash: " in hash_stats):
+                num = hash_stats.split("Found hash: ")
+                cnum1 = num[1].replace("b'", "")
+                cnum = cnum1.replace("'", "")
             
-            # Checking if  client is resending the same hash send by the server 
-            if(cnum == hashb):
-                print("Wrong hash returned")
-                client.send("BAD SHARES".encode())
+                # Checking if  client is resending the same hash send by the server 
+                if(cnum == hashb):
+                    print("Wrong hash returned")
+                    client.send("BAD SHARES".encode())
 
-                # Generating hash and send after 5s delay
-                hashb = gen_hash(min, max)
-                time.sleep(5)
-                client.send(hashb.encode())
-                print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
-            else:
-                chash = hashlib.sha256(num[1].encode()).hexdigest()
-                if (chash == hashb):
-                    time.sleep(1)
-                    client.send("GOOD SHARES".encode())
+                    # Generating hash and send after 5s delay
                     hashb = gen_hash(min, max)
                     time.sleep(5)
                     client.send(hashb.encode())
                     print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
+                else:
+                    chash = hashlib.sha256(num[1].encode()).hexdigest()
+                    if (chash == hashb):
+                        time.sleep(1)
+                        client.send("GOOD SHARES".encode())
+                        hashb = gen_hash(min, max)
+                        time.sleep(5)
+                        client.send(hashb.encode())
+                        print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
+        elif (s.decode() == "END"):
+            client.close()
+            print(Fore.RED + "Client disconnected" + Style.RESET_ALL)
+            exit()
         
-
 
 if __name__ == '__main__':
     while True:
@@ -101,10 +89,13 @@ if __name__ == '__main__':
         client.send(f'{SERVER_VER},{diff}'.encode())
         thread_count += 1
         IPS = str(thread_count)
+        print(IPS)
         C_IP = address[0] + ":" + str(address[1])
+        print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
         start_new_thread(client_thread, (client, C_IP, IPS ))
-
+        
+ 
 
 
     

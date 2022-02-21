@@ -1,5 +1,7 @@
 import socket
 import time
+import signal
+import sys
 
 stats = socket.socket()
 HOST = "127.0.0.1"
@@ -10,14 +12,18 @@ try:
 except socket.error as e:
     print(str(e))
 
-
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    stats.send("END".encode())
+    time.sleep(5)
+    sys.exit(0)
 while True:
-    stats.send("status".encode())
-    data = stats.recv(4098).decode().split(",")
+    stats.send("STATUS".encode())
+    data = ""
+    data = stats.recv(1024).decode().split(",")
     print(data)
-    SERVER_IP = data[0]
-    SERVER_PORT = data[1]
-    SERVER_VER = data[3]
+    SERVER_VER = data[0]
     CLIENT_CONN = data[1]
-    print(f'Server IP: {SERVER_IP}:{SERVER_PORT}\nServer version: {SERVER_VER}\nClient Connected : {CLIENT_CONN}')
-    time.sleep(10)
+    print(f'Server IP: {HOST}:{PORT}\nServer version: {SERVER_VER}\nClient Connected : {CLIENT_CONN}')
+    time.sleep(5)
+    signal.signal(signal.SIGINT, signal_handler)
