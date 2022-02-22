@@ -16,7 +16,6 @@ diff = str(max)
 HOST = "127.0.0.1"
 PORT = 9090
 thread_count = 0
-IPS = 0
 SERVER_VER = "v1.0"
 
 # Start the the sever and listen for the client
@@ -33,7 +32,7 @@ def gen_hash(min, max):
     return hash
 
     
-def client_thread(client, addr, IPS):
+def client_thread(client, addr, IP):
     while True:
         s = client.recv(1024)
         if (s.decode() == "STATUS"):
@@ -88,12 +87,12 @@ if __name__ == '__main__':
         client, address = server.accept()
         client.send(f'{SERVER_VER},{diff}'.encode())
         thread_count += 1
-        IPS = str(thread_count)
-        print(IPS)
+        IPS = IPS.append(str(address[1]))
+        c = len(IPS)
         C_IP = address[0] + ":" + str(address[1])
         print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
-        start_new_thread(client_thread, (client, C_IP, IPS ))
+        start_new_thread(client_thread, (client, C_IP, c ))
         
  
 

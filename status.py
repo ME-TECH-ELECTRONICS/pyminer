@@ -17,9 +17,13 @@ def signal_handler(sig, frame):
     stats.send("END".encode())
     time.sleep(5)
     sys.exit(0)
+
+#stats.send("STATUS".encode())
+#n = stats.recv(1024)
+
 while True:
     stats.send("STATUS".encode())
-    data = ""
+    print("Fetching data...")
     data = stats.recv(1024).decode().split(",")
     print(data)
     SERVER_VER = data[0]
