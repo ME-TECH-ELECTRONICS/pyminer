@@ -40,14 +40,14 @@ def gen_hash(min, max):
     return hash
 
     
-def client_thread(client, addr, IP):
+def client_thread(client, addr):
     while True:
         s = client.recv(1024)
         if (s.decode() == "STATUS"):
             time.sleep(2)
             client.send(f'{SERVER_VER},{IPS}'.encode())
     
-        elif (s.decode() == "READY"):
+        elif (s.decode() == "JOB"):
             print(addr + " - Recived ack")
         
             # Generating hash to find
@@ -95,12 +95,10 @@ if __name__ == '__main__':
         client, address = server.accept()
         client.send(f'{SERVER_VER},{diff}'.encode())
         thread_count += 1
-        IPS = IPS.append(str(address[1]))
-        c = len(IPS)
         C_IP = address[0] + ":" + str(address[1])
         print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
-        start_new_thread(client_thread, (client, C_IP, c ))
+        start_new_thread(client_thread, (client, C_IP))
     
  
 
