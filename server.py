@@ -1,10 +1,12 @@
 # Include libraries
 import hashlib
+from itertools import count
 
 import random
 import socket
 import time
 from _thread import *
+from turtle import st
 from colorama import Fore, Style, Back
 
 # Initialize variables
@@ -17,10 +19,16 @@ HOST = "127.0.0.1"
 PORT = 9090
 thread_count = 0
 SERVER_VER = "v1.0"
+IPS = []
 
 # Start the the sever and listen for the client
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("127.0.0.1", 9090))
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+if hasattr(socket,"TCP_QUICKACK"):
+    server.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+server.setblocking(1)
+server.bind((HOST, PORT))
 server.listen(10)
 print(Fore.GREEN + "Server started at 127.0.0.1:9090" + Style.RESET_ALL)
 
@@ -93,7 +101,7 @@ if __name__ == '__main__':
         print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
         start_new_thread(client_thread, (client, C_IP, c ))
-        
+    
  
 
 
