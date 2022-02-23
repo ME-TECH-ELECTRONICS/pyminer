@@ -1,38 +1,57 @@
-# Including libaries
+############################################
+""" Including libaries """
+############################################
 import hashlib
 import socket
 import time
+import signal
+import sys
 from datetime import datetime
 from colorama import Fore, Back, Style
 
-# Initialize variables
+############################################
+""" Initialize variables """
+############################################
 client = socket.socket()
 HOST = "127.0.0.1"
 PORT = 9090
 
-# Connecting to the server
+############################################
+"""Connecting to the server"""
+############################################
 try:
     client.connect((HOST, PORT))
 except socket.error as e:
     print(str(e))
+
+############################################
+    ''' Ctrl C event handler'''
+############################################
+def signal_handler(sig, frame):
+    print(Fore.YELLOW + "Exiting miner....Bye!" + Style.RESET_ALL)
+    client.send("END".encode())
+    time.sleep(5)
+    sys.exit(0)
 
 raw_data = client.recv(1024).decode().split(",")
 SERVER_VER = raw_data[0]
 diff = int(raw_data[1])
 print(f'Connected to {HOST}:{PORT}.\nServer version {SERVER_VER}. \nHappy Minning :)') 
 
+############################################
+''' Main program '''
+############################################
 while True:
-    # Sending Ready ack to sever
+    signal.signal(signal.SIGINT, signal_handler)
     client.send("JOB".encode())
-    # Requesting the difficulty of hash
-    dificulty = diff
+    difficulty = diff
 
     # Requesting the ref hash from server
     ref_hash = client.recv(1024)
     t1 = time.time()
 
     # Starting the mining process
-    for x in range(dificulty):
+    for x in range(difficulty):
         num = str(x).encode()
         my_hash = hashlib.sha256(num).hexdigest().encode()
 
@@ -43,11 +62,25 @@ while True:
             t_taken = float(tim)
             h = x/t_taken
             hashrate = format(h/1000, ".0f")
-            # Sending the hash found by the client to server
             client.send(f'Found hash: {x}'.encode())
-            ref_hash = ""
             reward = client.recv(1024).decode()
             if(reward == "GOOD SHARES"):
-                print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ") + Style.BRIGHT + Back.GREEN + Fore.BLACK +'SYS0' + Style.RESET_ALL + Fore.GREEN + " - ⛏ Accepted - " + Style.RESET_ALL + tim + "s - " + Fore.BLUE + hashrate + "KH/s" + Style.RESET_ALL)
-            else:
-                print(reward)
+                print(Fore.WHITE 
+                      + datetime.now().strftime(Style.DIM + "%H:%M:%S ") 
+                      + Style.BRIGHT + Back.GREEN + Fore.BLACK +'SYS0' 
+                      + Style.RESET_ALL + " - " + Fore.GREEN + "⛏ Accepted" 
+                      + Style.RESET_ALL + " - " + tim + "s - " 
+                      + Fore.BLUE + hashrate + "KH/s" 
+                      + Style.RESET_ALL
+                      + " - ⚙ diff: "
+                      + str(diff))
+            elif(reward == "BAD SHARES"):
+                print(Fore.WHITE 
+                      + datetime.now().strftime(Style.DIM + "%H:%M:%S ") 
+                      + Style.BRIGHT + Back.GREEN + Fore.BLACK +'SYS0' 
+                      + Style.RESET_ALL + Fore.RED + " - ⛏ Rejected - " 
+                      + Style.RESET_ALL + tim + "s - " 
+                      + Fore.BLUE + hashrate + "KH/s" 
+                      + Style.RESET_ALL
+                      + "⚙ diff: "
+                      + str(diff))

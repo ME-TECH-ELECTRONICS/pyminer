@@ -1,12 +1,9 @@
 # Include libraries
 import hashlib
-from itertools import count
-
 import random
 import socket
 import time
 from _thread import *
-from turtle import st
 from colorama import Fore, Style, Back
 
 # Initialize variables
@@ -86,7 +83,7 @@ def client_thread(client, addr):
                         print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
         elif (s.decode() == "END"):
             client.close()
-            print(Fore.RED + "Client disconnected" + Style.RESET_ALL)
+            print(Fore.RED + addr +" disconnected" + Style.RESET_ALL)
             exit()
         
 
@@ -98,7 +95,7 @@ if __name__ == '__main__':
         C_IP = address[0] + ":" + str(address[1])
         print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
-        start_new_thread(client_thread, (client, C_IP))
+        start_new_thread(client_thread, (client, C_IP,))
     
  
 
