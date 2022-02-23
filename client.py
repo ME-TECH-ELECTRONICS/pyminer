@@ -24,11 +24,7 @@ print(f'Connected to {HOST}:{PORT}.\nServer version {SERVER_VER}. \nHappy Minnin
 while True:
     # Sending Ready ack to sever
     client.send("JOB".encode())
-    print("Sending ack")
-
     # Requesting the difficulty of hash
-    #diff = client.recv(1024)
-    print("Difficulty: ",diff)
     dificulty = diff
 
     # Requesting the ref hash from server
@@ -50,10 +46,8 @@ while True:
             # Sending the hash found by the client to server
             client.send(f'Found hash: {x}'.encode())
             ref_hash = ""
-            print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ") + Style.BRIGHT + Back.GREEN + Fore.BLACK +'SYS0' + Style.RESET_ALL + "found hash in {tim}s")
-            print(f'Hashrate: {hashrate}KH/s')
             reward = client.recv(1024).decode()
             if(reward == "GOOD SHARES"):
-                print(reward)
+                print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ") + Style.BRIGHT + Back.GREEN + Fore.BLACK +'SYS0' + Style.RESET_ALL + Fore.GREEN + " - ⛏ Accepted - " + Style.RESET_ALL + tim + "s - " + Fore.BLUE + hashrate + "KH/s" + Style.RESET_ALL)
             else:
                 print(reward)

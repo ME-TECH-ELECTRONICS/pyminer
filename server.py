@@ -12,8 +12,8 @@ from colorama import Fore, Style, Back
 # Initialize variables
 Test ="" 
 hash = ""
-min = 100000
-max = 10000000
+min = 10000
+max = 100000
 diff = str(max)
 HOST = "127.0.0.1"
 PORT = 9090
