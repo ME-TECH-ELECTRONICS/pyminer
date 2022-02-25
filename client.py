@@ -15,6 +15,7 @@ from colorama import Fore, Back, Style
 client = socket.socket()
 HOST = "127.0.0.1"
 PORT = 9090
+diff_lvl = input("Enter difficulty level: ")
 
 ############################################
 """Connecting to the server"""
@@ -33,9 +34,8 @@ def signal_handler(sig, frame):
     time.sleep(5)
     sys.exit(0)
 
-raw_data = client.recv(1024).decode().split(",")
-SERVER_VER = raw_data[0]
-diff = int(raw_data[1])
+raw_data = client.recv(1024).decode()
+SERVER_VER = raw_data
 print(f'Connected to {HOST}:{PORT}.\nServer version {SERVER_VER}. \nHappy Minning :)') 
 
 ############################################

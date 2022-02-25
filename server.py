@@ -1,4 +1,6 @@
-# Include libraries
+############################################
+'''Include libraries'''
+############################################
 import hashlib
 import random
 import socket
@@ -90,7 +92,7 @@ def client_thread(client, addr):
 if __name__ == '__main__':
     while True:
         client, address = server.accept()
-        client.send(f'{SERVER_VER},{diff}'.encode())
+        client.send(f'{SERVER_VER}'.encode())
         thread_count += 1
         C_IP = address[0] + ":" + str(address[1])
         print(str(address))
