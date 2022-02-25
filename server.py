@@ -11,8 +11,6 @@ from colorama import Fore, Style, Back
 # Initialize variables
 Test ="" 
 hash = ""
-min = 1000000
-max = 10000000
 diff = str(max)
 HOST = "127.0.0.1"
 PORT = 9090
@@ -38,17 +36,35 @@ def gen_hash(min, max):
     hash = hashlib.sha256(Digit).hexdigest()
     return hash
 
-    
+def diff_range(diff_lvl):
+    if diff_lvl == "LOW":
+        min = 1000
+        max = 10000
+        return min, max
+    elif(diff_lvl == "MEDIUM"):
+        min = 10000
+        max = 100000
+        return min, max
+    elif(diff_lvl == "HIGH"):
+        min = 100000
+        max = 1000000
+        return min, max
+
+
+
 def client_thread(client, addr):
+    diff_lvl = client.recv(256).decode()
+    (min, max) = diff_range(diff_lvl)
+    client.send(str(max).encode())
     while True:
-        s = client.recv(1024)
-        if (s.decode() == "STATUS"):
+        s = client.recv(1024).decode()
+        if (s[0] == "STATUS"):
             time.sleep(2)
             client.send(f'{SERVER_VER},{IPS}'.encode())
     
-        elif (s.decode() == "JOB"):
+        elif (s[0] == "JOB"):
             print(addr + " - Recived ack")
-        
+            
             # Generating hash to find
             hashb = gen_hash(min, max)
             print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
@@ -58,14 +74,11 @@ def client_thread(client, addr):
             client.send(hashb.encode())
 
             # Waiting for client send the hash they found
-            hash_stats = client.recv(1024).decode()
-            if("Found hash: " in hash_stats):
-                num = hash_stats.split("Found hash: ")
-                cnum1 = num[1].replace("b'", "")
-                cnum = cnum1.replace("'", "")
-            
+            nonce = client.recv(1024).decode()
+            if("Found nonce: " in nonce):
+                num = nonce.split("Found nonce: ")
                 # Checking if  client is resending the same hash send by the server 
-                if(cnum == hashb):
+                if(num == hashb):
                     print("Wrong hash returned")
                     client.send("BAD SHARES".encode())
 
@@ -83,7 +96,7 @@ def client_thread(client, addr):
                         time.sleep(5)
                         client.send(hashb.encode())
                         print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
-        elif (s.decode() == "END"):
+        elif (s == "END"):
             client.close()
             print(Fore.RED + addr +" disconnected" + Style.RESET_ALL)
             exit()
@@ -93,7 +106,6 @@ if __name__ == '__main__':
     while True:
         client, address = server.accept()
         client.send(f'{SERVER_VER}'.encode())
-        thread_count += 1
         C_IP = address[0] + ":" + str(address[1])
         print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )

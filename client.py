@@ -37,21 +37,22 @@ def signal_handler(sig, frame):
 raw_data = client.recv(1024).decode()
 SERVER_VER = raw_data
 print(f'Connected to {HOST}:{PORT}.\nServer version {SERVER_VER}. \nHappy Minning :)') 
-
+client.send(diff_lvl.encode())
+diff = client.recv(256).decode()
 ############################################
 ''' Main program '''
 ############################################
+
 while True:
     signal.signal(signal.SIGINT, signal_handler)
-    client.send("JOB".encode())
-    difficulty = diff
+    client.send('JOB'.encode())
 
     # Requesting the ref hash from server
     ref_hash = client.recv(1024)
     t1 = time.time()
 
     # Starting the mining process
-    for x in range(difficulty):
+    for x in range(int(diff)):
         num = str(x).encode()
         my_hash = hashlib.sha256(num).hexdigest().encode()
 
@@ -62,7 +63,7 @@ while True:
             t_taken = float(tim)
             h = x/t_taken
             hashrate = format(h/1000, ".0f")
-            client.send(f'Found hash: {x}'.encode())
+            client.send(f'Found nonce: {x}'.encode())
             reward = client.recv(1024).decode()
             if(reward == "GOOD SHARES"):
                 print(Fore.WHITE 
@@ -84,3 +85,4 @@ while True:
                       + Style.RESET_ALL
                       + "⚙ diff: "
                       + str(diff))
+
