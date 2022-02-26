@@ -4,6 +4,8 @@
 import hashlib
 import random
 import socket
+import subprocess
+import threading
 import time
 from _thread import *
 from colorama import Fore, Style, Back
@@ -36,6 +38,16 @@ def gen_hash(min, max):
     hash = hashlib.sha256(Digit).hexdigest()
     return hash
 
+def client_count:
+    c_count = subprocess.run(
+        'netstat -ap | grep ESTABLISHED | grep python3.9',
+       stdout=subprocess.PIPE,
+       shell=True
+     ).stdout.decode().rstrip()
+     time.sleep(10)
+     print(f'Connected client: {c_count}')
+
+
 def diff_range(diff_lvl):
     if diff_lvl == "LOW":
         min = 1000
@@ -49,8 +61,6 @@ def diff_range(diff_lvl):
         min = 100000
         max = 1000000
         return min, max
-
-
 
 def client_thread(client, addr):
     diff_lvl = client.recv(256).decode()
@@ -69,7 +79,7 @@ def client_thread(client, addr):
             
             # Generating hash to find
             hashb = gen_hash(min, max)
-            print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
+            print(Fore.GREEN + "" + Style.RESET_ALL + hashb )
 
             # Sending hash to client
             time.sleep(1)
@@ -106,6 +116,7 @@ def client_thread(client, addr):
 
 if __name__ == '__main__':
     while True:
+        threading.Thread(target=client_count).start()
         client, address = server.accept()
         client.send(f'{SERVER_VER}'.encode())
         C_IP = address[0] + ":" + str(address[1])
