@@ -36,7 +36,7 @@ def signal_handler(sig, frame):
 
 raw_data = client.recv(1024).decode()
 SERVER_VER = raw_data
-print(f'Connected to {HOST}:{PORT}.\nServer version {SERVER_VER}. \nHappy Minning :)') 
+print(Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Connected to {HOST}:{PORT}.\n'+ Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Server version {SERVER_VER}.') 
 client.send(diff_lvl.encode())
 diff = client.recv(256).decode()
 ############################################

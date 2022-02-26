@@ -56,13 +56,15 @@ def client_thread(client, addr):
     diff_lvl = client.recv(256).decode()
     (min, max) = diff_range(diff_lvl)
     client.send(str(max).encode())
+    print(diff_lvl)
     while True:
         s = client.recv(1024).decode()
-        if (s[0] == "STATUS"):
+        print(s)
+        if (s == "STATUS"):
             time.sleep(2)
             client.send(f'{SERVER_VER},{IPS}'.encode())
     
-        elif (s[0] == "JOB"):
+        elif (s == "JOB"):
             print(addr + " - Recived ack")
             
             # Generating hash to find
