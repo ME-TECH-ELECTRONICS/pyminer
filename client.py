@@ -5,7 +5,7 @@ import hashlib
 import socket
 import time
 import signal
-import sys
+from os import execl, mkdir, _exit
 from datetime import datetime
 from colorama import Fore, Back, Style
 
@@ -32,7 +32,7 @@ def signal_handler(sig, frame):
     print(Fore.YELLOW + "Exiting miner....Bye!" + Style.RESET_ALL)
     client.send("END".encode())
     time.sleep(5)
-    sys.exit(0)
+    _exit(0)
 
 raw_data = client.recv(1024).decode()
 SERVER_VER = raw_data
