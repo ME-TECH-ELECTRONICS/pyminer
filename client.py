@@ -9,6 +9,7 @@ from  sys import exit
 from os import execl, mkdir
 from datetime import datetime
 from colorama import Fore, Back, Style
+from pathlib import Path
 
 ############################################
 """ Initialize variables """
@@ -34,6 +35,10 @@ def signal_handler(sig, frame):
     print(Fore.YELLOW + "Exiting miner....Bye!" + Style.RESET_ALL)
     time.sleep(5)
     exit(0)
+
+class SETTINGS:
+    DATA_DIR = "Miner-cfg"
+    SETTINGS_FILE = "/config.cfg"
 
 raw_data = client.recv(1024).decode()
 SERVER_VER = raw_data
