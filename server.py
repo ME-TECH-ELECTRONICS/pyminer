@@ -45,7 +45,7 @@ def client_count():
        shell=True
      ).stdout.decode().rstrip()
     time.sleep(10)
-    print(Fore.YELLOW + "Connected client: " + c_count/2)
+    print(Fore.YELLOW + "Connected client: " + int(c_count)/2)
 
 
 def diff_range(diff_lvl):
