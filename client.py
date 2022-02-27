@@ -15,7 +15,7 @@ from colorama import Fore, Back, Style
 client = socket.socket()
 HOST = "127.0.0.1"
 PORT = 9090
-diff_lvl = input("Enter difficulty level: ")
+diff_lvl = "LOW"#input("Enter difficulty level: ")
 
 ############################################
 """Connecting to the server"""
