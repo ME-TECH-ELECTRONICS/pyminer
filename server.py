@@ -39,13 +39,14 @@ def gen_hash(min, max):
     return hash
 
 def client_count():
-    c_count = subprocess.run(
+    count = subprocess.run(
         'netstat -ap | grep ESTABLISHED | grep python3.9 | wc -l',
        stdout=subprocess.PIPE,
        shell=True
      ).stdout.decode().rstrip()
     time.sleep(10)
-    print(Fore.YELLOW + "Connected client: " + int(c_count)/2)
+    c_count = int(count)/2
+    print(Fore.YELLOW + "Connected client: " + str(c_count))
 
 
 def diff_range(diff_lvl):
