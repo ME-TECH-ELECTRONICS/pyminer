@@ -5,7 +5,8 @@ import hashlib
 import socket
 import time
 import signal
-from os import execl, mkdir, _exit
+from  sys import exit
+from os import execl, mkdir
 from datetime import datetime
 from colorama import Fore, Back, Style
 
@@ -26,13 +27,13 @@ except socket.error as e:
     print(str(e))
 
 ############################################
-    ''' Ctrl C event handler'''
+########    Ctrl C event handler   #########
 ############################################
 def signal_handler(sig, frame):
     client.send("END".encode())
     print(Fore.YELLOW + "Exiting miner....Bye!" + Style.RESET_ALL)
     time.sleep(5)
-    _exit(0)
+    exit(0)
 
 raw_data = client.recv(1024).decode()
 SERVER_VER = raw_data

@@ -6,11 +6,15 @@ import random
 import socket
 import subprocess
 import threading
+import signal
+from sys import exit
+from os import mkdir
 import time
 from _thread import *
 from colorama import Fore, Style, Back
-
-# Initialize variables
+############################################
+'''Initialize variables'''
+############################################
 Test ="" 
 hash = ""
 diff = str(max)
@@ -20,7 +24,9 @@ thread_count = 0
 SERVER_VER = "v1.0"
 IPS = []
 
-# Start the the sever and listen for the client
+############################################
+'''Start the sever and listen for the client'''
+############################################
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -29,9 +35,10 @@ if hasattr(socket,"TCP_QUICKACK"):
 server.setblocking(1)
 server.bind((HOST, PORT))
 server.listen(10)
-print(Fore.GREEN + "Server started at 127.0.0.1:9090" + Style.RESET_ALL)
 
-# Function for generating hash
+############################################
+'''Function for generating hash'''
+############################################
 def gen_hash(min, max):
     a = random.randrange(min, max)
     Digit = str(a).encode()
@@ -46,7 +53,8 @@ def client_count():
      ).stdout.decode().rstrip()
     time.sleep(10)
     c_count = int(count)/2
-    print(Fore.YELLOW + "Connected client: " + str(c_count))
+    return c_count
+    #print(Fore.YELLOW + "Connected client: " + str(c_count) + Style.RESET_ALL)
 
 
 def diff_range(diff_lvl):
@@ -68,12 +76,14 @@ def client_thread(client, addr):
     (min, max) = diff_range(diff_lvl)
     client.send(str(max).encode())
     print(diff_lvl)
+
     while True:
-        s = client.recv(1024).decode()
+        s = client.recv(512).decode()
         print(s)
         if (s == "STATUS"):
+            CLIENT_CONN = str(client_count())
             time.sleep(2)
-            client.send(f'{SERVER_VER},{IPS}'.encode())
+            client.send(f'{SERVER_VER},{CLIENT_CONN}'.encode())
     
         elif (s == "JOB"):
             print(addr + " - Recived ack")
@@ -116,16 +126,13 @@ def client_thread(client, addr):
         
 
 if __name__ == '__main__':
+    #threading.Thread(target=client_count).start()
     while True:
-        threading.Thread(target=client_count).start()
+        print(Fore.GREEN + "Server started at 127.0.0.1:9090" + Style.RESET_ALL)
         client, address = server.accept()
         client.send(f'{SERVER_VER}'.encode())
         C_IP = address[0] + ":" + str(address[1])
         print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
         start_new_thread(client_thread, (client, C_IP,))
-    
- 
-
-
     
