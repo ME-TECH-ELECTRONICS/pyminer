@@ -9,17 +9,45 @@ from  sys import exit
 from os import execl, mkdir
 from datetime import datetime
 from colorama import Fore, Back, Style
+from pathlib import Path
+from configparser import ConfigParser
 
 ############################################
 """ Initialize variables """
 ############################################
 client = socket.socket()
+configparser = ConfigParser()
 HOST = "127.0.0.1"
 PORT = 9090
-diff_lvl = "LOW"#input("Enter difficulty level: ")
 
 class SETTINGS:
-    VER = "v1.0"
+    DATA_DIR = "Miner-cfg"
+    CONFIG_FILE = "/config.cfg"
+
+def load_cfg():
+    if not Path(SETTINGS.DATA_DIR).is_dir():
+        mkdir(SETTINGS.DATA_DIR)
+    if not Path(SETTINGS.DSTA_DIR + SETTINGS.CONFIG_FILE).is_file():
+        print("Basic Config file setup")
+        username = input("Enter the username: ")
+        print("Available options: LOW, MEDIUM, HIGH")
+        diff_lvl = input("Enter the difficulty: ")
+        rig_id = input("Enter a name for the Rig ")
+        
+        configparser["PC Miner"] = {
+            "username":    username,
+            "difficulty":  diff_lvl,
+            "rid_id":      rig_id}
+        with open(SETTINGS.DATA_DIR + SETTINGS.CONFIG_FILE, "w") as configfile:
+                configparser.write(configfile)
+    configparser.read(SETTINGS.DATA_DIR+ SETTINGS.CONFIG_FILE)
+    return configparser["PC Miner"]
+
+config = load_cfg()
+username = config["username"]
+diff_lvl = config["difficulty"]
+rig_id = config["rid_id"]
+print(username, diff_lvl, rig_id)
 ############################################
 """Connecting to the server"""
 ############################################
