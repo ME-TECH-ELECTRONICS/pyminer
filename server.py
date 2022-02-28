@@ -58,7 +58,10 @@ def client_count():
 
 
 def diff_range(diff_lvl):
-    if diff_lvl == "LOW":
+    if(diff_lvl == "ULTRA_LOW"):
+        min = 100
+        max = 1000
+    elif diff_lvl == "LOW":
         min = 1000
         max = 10000
         return min, max
@@ -79,7 +82,6 @@ def client_thread(client, addr):
 
     while True:
         s = client.recv(512).decode()
-        print(s)
         if (s == "STATUS"):
             CLIENT_CONN = str(client_count())
             time.sleep(2)
@@ -87,10 +89,10 @@ def client_thread(client, addr):
     
         elif (s == "JOB"):
             print(addr + " - Recived ack")
-            
+            s =""
             # Generating hash to find
             hashb = gen_hash(min, max)
-            print(Fore.GREEN + "" + Style.RESET_ALL + hashb )
+            print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb )
 
             # Sending hash to client
             time.sleep(1)
@@ -108,8 +110,8 @@ def client_thread(client, addr):
                     # Generating hash and send after 5s delay
                     hashb = gen_hash(min, max)
                     time.sleep(5)
-                    client.send(hashb.encode())
-                    print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
+                    '''client.send(hashb.encode())
+                    print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)'''
                 else:
                     chash = hashlib.sha256(num[1].encode()).hexdigest()
                     if (chash == hashb):
@@ -117,9 +119,9 @@ def client_thread(client, addr):
                         client.send("GOOD SHARES".encode())
                         hashb = gen_hash(min, max)
                         time.sleep(5)
-                        client.send(hashb.encode())
-                        print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)
-        elif (s == "END"):
+                        '''client.send(hashb.encode())
+                        print(Fore.GREEN + "Sending Job: " + Style.RESET_ALL + hashb)'''
+        elif (s == "END" or "JOBEND"):
             client.close()
             print(Fore.RED + addr +" disconnected" + Style.RESET_ALL)
             exit()

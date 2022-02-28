@@ -1,5 +1,5 @@
 ############################################
-""" Including libaries """
+###########  Importing libaries  ###########
 ############################################
 import hashlib
 import socket
@@ -13,20 +13,28 @@ from pathlib import Path
 from configparser import ConfigParser
 
 ############################################
-""" Initialize variables """
+######  Initialize global variables  #######
 ############################################
 client = socket.socket()
 configparser = ConfigParser()
 HOST = "127.0.0.1"
 PORT = 9090
 
+############################################
+#########  Default miner config  ###########
+############################################
 class SETTINGS:
     DATA_DIR = "Miner-cfg"
     CONFIG_FILE = "/config.cfg"
+    SOC_TIMEOUT = 15
 
+#############################################
+# Function for creating/loading config file #
+#############################################
 def load_cfg():
     if not Path(SETTINGS.DATA_DIR).is_dir():
         mkdir(SETTINGS.DATA_DIR)
+
     if not Path(SETTINGS.DATA_DIR + SETTINGS.CONFIG_FILE).is_file():
         print("Basic Config file setup")
         username = input("Enter the username: ")
@@ -37,19 +45,24 @@ def load_cfg():
         configparser["PC Miner"] = {
             "username":    username,
             "difficulty":  diff_lvl,
-            "rid_id":      rig_id}
+            "rid_id":      rig_id,
+            "soc_timeout": SETTINGS.SOC_TIMEOUT}
+
         with open(SETTINGS.DATA_DIR + SETTINGS.CONFIG_FILE, "w") as configfile:
                 configparser.write(configfile)
+
     configparser.read(SETTINGS.DATA_DIR+ SETTINGS.CONFIG_FILE)
     return configparser["PC Miner"]
 
+############################################
+###########  Load Config file  #############
+############################################
 config = load_cfg()
 username = config["username"]
 diff_lvl = config["difficulty"]
 rig_id = config["rid_id"]
-print(username, diff_lvl, rig_id)
 ############################################
-"""Connecting to the server"""
+########  Connecting to the server  ########
 ############################################
 try:
     client.connect((HOST, PORT))
@@ -70,15 +83,14 @@ SERVER_VER = raw_data
 print(Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Connected to {HOST}:{PORT}.\n'+ Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Server version {SERVER_VER}.') 
 client.send(diff_lvl.encode())
 diff = client.recv(256).decode()
+print(Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Difficulty set to {diff}.')
+
 ############################################
 ''' Main program '''
 ############################################
-
-while True:
+while (1):
     signal.signal(signal.SIGINT, signal_handler)
     client.send('JOB'.encode())
-
-    # Requesting the ref hash from server
     ref_hash = client.recv(1024)
     t1 = time.time()
 
@@ -106,6 +118,11 @@ while True:
                       + Style.RESET_ALL
                       + " - ⚙ diff: "
                       + str(diff))
+                print(Fore.WHITE 
+                    + datetime.now().strftime(Style.DIM + "%H:%M:%S ") 
+                    + Style.BRIGHT + Back.CYAN + Fore.BLACK +'INET' 
+                    + Style.RESET_ALL + " - " + "Recieved JOB" + Style.RESET_ALL)
+
             elif(reward == "BAD SHARES"):
                 print(Fore.WHITE 
                       + datetime.now().strftime(Style.DIM + "%H:%M:%S ") 
