@@ -27,7 +27,7 @@ class SETTINGS:
 def load_cfg():
     if not Path(SETTINGS.DATA_DIR).is_dir():
         mkdir(SETTINGS.DATA_DIR)
-    if not Path(SETTINGS.DSTA_DIR + SETTINGS.CONFIG_FILE).is_file():
+    if not Path(SETTINGS.DATA_DIR + SETTINGS.CONFIG_FILE).is_file():
         print("Basic Config file setup")
         username = input("Enter the username: ")
         print("Available options: LOW, MEDIUM, HIGH")
