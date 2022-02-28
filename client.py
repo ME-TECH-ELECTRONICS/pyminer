@@ -49,7 +49,12 @@ def load_cfg():
         print("Available options: LOW, MEDIUM, HIGH")
         diff_lvl = input("Enter the difficulty: ")
         rig_id = input("Enter a name for the Rig ")
-
+        
+        configparser["PC Miner"] = {
+            "username":    username,
+            "difficulty":  diff_lvl,
+            "rid_id":      rig_id}
+        
 
 load_cfg()
 
