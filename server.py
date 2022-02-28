@@ -61,6 +61,7 @@ def diff_range(diff_lvl):
     if(diff_lvl == "ULTRA_LOW"):
         min = 100
         max = 1000
+        return min, max
     elif diff_lvl == "LOW":
         min = 1000
         max = 10000
@@ -129,12 +130,11 @@ def client_thread(client, addr):
 
 if __name__ == '__main__':
     #threading.Thread(target=client_count).start()
+    print(Fore.GREEN + "Starting Master server......" + Style.RESET_ALL)
     while True:
-        print(Fore.GREEN + "Server started at 127.0.0.1:9090" + Style.RESET_ALL)
         client, address = server.accept()
         client.send(f'{SERVER_VER}'.encode())
         C_IP = address[0] + ":" + str(address[1])
-        print(str(address))
         print('Connected to: ' + address[0] + ':' + str(address[1]) )
         start_new_thread(client_thread, (client, C_IP,))
     
