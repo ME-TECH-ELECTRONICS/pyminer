@@ -54,8 +54,6 @@ def client_count():
     time.sleep(10)
     c_count = int(count)/2
     return c_count
-    #print(Fore.YELLOW + "Connected client: " + str(c_count) + Style.RESET_ALL)
-
 
 def diff_range(diff_lvl):
     if(diff_lvl == "ULTRA_LOW"):
