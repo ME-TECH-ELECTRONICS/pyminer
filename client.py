@@ -60,6 +60,7 @@ def load_cfg():
 config = load_cfg()
 username = config["username"]
 diff_lvl = config["difficulty"]
+print(diff_lvl)
 rig_id = config["rid_id"]
 ############################################
 ########  Connecting to the server  ########
@@ -80,14 +81,20 @@ def signal_handler(sig, frame):
 
 raw_data = client.recv(1024).decode()
 SERVER_VER = raw_data
-print(Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Connected to {HOST}:{PORT}.\n'+ Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Server version {SERVER_VER}.') 
+print(Fore.WHITE
+    + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+    + Style.BRIGHT + Fore.BLACK + Back.CYAN + "INET" 
+    + Style.RESET_ALL + f' Connected to {HOST}:{PORT} ({SERVER_VER})') 
 client.send(diff_lvl.encode())
 diff = client.recv(256).decode()
-print(Fore.BLACK + Back.CYAN + "INET" +Style.RESET_ALL + f' Difficulty set to {diff}.')
 
 ############################################
 ''' Main program '''
 ############################################
+print(Fore.WHITE
+    + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+    + Style.BRIGHT + Back.CYAN + Fore.BLACK +'INET'
+    + Style.RESET_ALL + " - " + "Recieved JOB" + Style.RESET_ALL)
 while (1):
     signal.signal(signal.SIGINT, signal_handler)
     client.send('JOB'.encode())
@@ -118,6 +125,7 @@ while (1):
                       + Style.RESET_ALL
                       + " - ⚙ diff: "
                       + str(diff))
+                time.sleep(1)
                 print(Fore.WHITE 
                     + datetime.now().strftime(Style.DIM + "%H:%M:%S ") 
                     + Style.BRIGHT + Back.CYAN + Fore.BLACK +'INET' 
